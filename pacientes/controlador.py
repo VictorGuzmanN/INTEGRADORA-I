@@ -24,3 +24,5 @@ class ControladorPaciente:
         self.vista.mostrar_resultado(
             paciente.mostrar_datos()
         )
+        
+        

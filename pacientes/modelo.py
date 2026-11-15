@@ -53,3 +53,35 @@ class Paciente:
             f"Teléfono: {self.telefono}\n"
             f"Tipo de sangre: {self.tipo_sangre}"
         )
+        
+    def editar_datos(self):
+        print("Datos editados")
+        
+    def eliminar_datos(self):
+        print("Datos eliminados")
+
+    def eliminar_todo(self):
+        print("Eliminando todos los datos del paciente")
+
+    def eliminar_todo_nombre(self):
+        print("Eliminando todos los datos de nombre")
+
+    def eliminar_todo_telefono(self):
+        print("Eliminando todos los datos de telefono")
+
+    def eliminar_todo_tipo_sangre(self):
+        print("Eliminando todos los datos de tipo de sangre")
+
+    def eliminar_todo_nombre_telefono(self):
+        print("Eliminando todos los datos de nombre y telefono")
+
+    def eliminar_todo_nombre_tipo_sangre(self):
+        print("Eliminando todos los datos de nombre y tipo de sangre")
+
+    def eliminar_todo_telefono_tipo_sangre(self):
+        print("Eliminando todos los datos de telefono y tipo de sangre")
+
+    def eliminar_todo_nombre_telefono_tipo_sangre(self):
+        print("Eliminando todos los datos de nombre, telefono y tipo de sangre")
+        
+        
