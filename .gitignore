@@ -1,0 +1,18 @@
+# Archivos con contraseñas y variables sensibles
+.env
+
+# Entornos virtuales y caché de Python
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+
+# Archivos generados por PyInstaller (.exe)
+build/
+dist/
+*.spec
+
+# Archivos del sistema y editores
+.DS_Store
+Thumbs.db
+.vscode/
