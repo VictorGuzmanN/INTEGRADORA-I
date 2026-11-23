@@ -57,7 +57,7 @@ HTML_LOGIN = """
         {% endwith %}
         <form method="POST">
             <label>Usuario</label>
-            <input type="text" name="usuario" placeholder="Ej. admin o doctor1" required>
+            <input type="text" name="usuario" placeholder="Ingresa tu usuario" required>
             <label>Contraseña</label>
             <input type="password" name="contrasena" placeholder="Ingresa tu contraseña" required>
             <button type="submit">Iniciar sesión</button>
