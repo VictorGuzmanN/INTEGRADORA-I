@@ -20,7 +20,15 @@ class PacienteController:
             conexion.close()
 
     @staticmethod
-    def crear_paciente(nombre, apellido1, apellido2="", telefono="", calle="", numero="", colonia="", ciudad="", estado="", codigo_postal="", tipo_sangre="", alergias="", estado_paciente="Registrado"):
+    def crear_paciente(nombre, apellido1="", apellido2="", telefono="", calle="", numero="", colonia="", ciudad="", estado="", codigo_postal="", tipo_sangre="", alergias="", estado_paciente="Registrado"):
+        if hasattr(nombre, "nombre"):
+            pac = nombre
+            return PacienteController.crear_paciente(
+                pac.nombre, pac.apellido1, pac.apellido2, pac.telefono,
+                pac.calle, pac.numero, pac.colonia, pac.ciudad, pac.estado,
+                pac.codigo_postal, pac.tipo_sangre, pac.alergias, pac.estado_paciente
+            )
+
         conexion = ConexionBD.obtener_conexion()
         if not conexion:
             return False, "No se pudo conectar a MySQL."
@@ -40,7 +48,19 @@ class PacienteController:
             conexion.close()
 
     @staticmethod
-    def actualizar_paciente(id_paciente, nombre, apellido1, apellido2="", telefono="", calle="", numero="", colonia="", ciudad="", estado="", codigo_postal="", tipo_sangre="", alergias="", estado_paciente="Registrado"):
+    def registrar_paciente(paciente):
+        return PacienteController.crear_paciente(paciente)
+
+    @staticmethod
+    def actualizar_paciente(id_paciente, nombre="", apellido1="", apellido2="", telefono="", calle="", numero="", colonia="", ciudad="", estado="", codigo_postal="", tipo_sangre="", alergias="", estado_paciente="Registrado"):
+        if hasattr(id_paciente, "id_paciente"):
+            pac = id_paciente
+            return PacienteController.actualizar_paciente(
+                pac.id_paciente, pac.nombre, pac.apellido1, pac.apellido2, pac.telefono,
+                pac.calle, pac.numero, pac.colonia, pac.ciudad, pac.estado,
+                pac.codigo_postal, pac.tipo_sangre, pac.alergias, pac.estado_paciente
+            )
+
         conexion = ConexionBD.obtener_conexion()
         if not conexion:
             return False, "No se pudo conectar a MySQL."

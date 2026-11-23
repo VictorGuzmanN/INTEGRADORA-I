@@ -10,6 +10,8 @@ class TratamientoController:
         try:
             cursor = conexion.cursor(dictionary=True)
             sql = """SELECT t.id_tratamiento, t.id_doctor, t.id_paciente, 
+                            CONCAT(d.nombre, ' ', d.apellido1) AS doctor,
+                            CONCAT(p.nombre, ' ', p.apellido1) AS paciente,
                             CONCAT(d.id_doctor, ' - ', d.nombre, ' ', d.apellido1) AS doctor_nombre,
                             CONCAT(p.id_paciente, ' - ', p.nombre, ' ', p.apellido1) AS paciente_nombre,
                             t.fecha, t.hora, t.tratamiento, t.diagnostico_inicial, t.fecha_entrada
@@ -25,7 +27,14 @@ class TratamientoController:
             conexion.close()
 
     @staticmethod
-    def crear_tratamiento(id_doctor, id_paciente, fecha, hora, tratamiento, diagnostico_inicial, fecha_entrada):
+    def crear_tratamiento(id_doctor, id_paciente=None, fecha="", hora="", tratamiento="", diagnostico_inicial="", fecha_entrada=""):
+        if hasattr(id_doctor, "id_doctor"):
+            trat = id_doctor
+            return TratamientoController.crear_tratamiento(
+                trat.id_doctor, trat.id_paciente, trat.fecha, trat.hora,
+                trat.tratamiento, trat.diagnostico_inicial, trat.fecha_entrada
+            )
+
         conexion = ConexionBD.obtener_conexion()
         if not conexion:
             return False, "No se pudo conectar a MySQL."
@@ -45,7 +54,18 @@ class TratamientoController:
             conexion.close()
 
     @staticmethod
-    def actualizar_tratamiento(id_tratamiento, id_doctor, id_paciente, fecha, hora, tratamiento, diagnostico_inicial, fecha_entrada):
+    def registrar_tratamiento(tratamiento):
+        return TratamientoController.crear_tratamiento(tratamiento)
+
+    @staticmethod
+    def actualizar_tratamiento(id_tratamiento, id_doctor=None, id_paciente=None, fecha="", hora="", tratamiento="", diagnostico_inicial="", fecha_entrada=""):
+        if hasattr(id_tratamiento, "id_tratamiento"):
+            trat = id_tratamiento
+            return TratamientoController.actualizar_tratamiento(
+                trat.id_tratamiento, trat.id_doctor, trat.id_paciente, trat.fecha,
+                trat.hora, trat.tratamiento, trat.diagnostico_inicial, trat.fecha_entrada
+            )
+
         conexion = ConexionBD.obtener_conexion()
         if not conexion:
             return False, "No se pudo conectar a MySQL."

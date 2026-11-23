@@ -20,7 +20,15 @@ class DoctorController:
             conexion.close()
 
     @staticmethod
-    def crear_doctor(nombre, apellido1, apellido2="", especialidad="", numero_cedula="", telefono="", calle="", numero="", colonia="", ciudad="", estado="", codigo_postal=""):
+    def crear_doctor(nombre, apellido1="", apellido2="", especialidad="", numero_cedula="", telefono="", calle="", numero="", colonia="", ciudad="", estado="", codigo_postal=""):
+        if hasattr(nombre, "nombre"):
+            doc = nombre
+            return DoctorController.crear_doctor(
+                doc.nombre, doc.apellido1, doc.apellido2, doc.especialidad,
+                doc.numero_cedula, doc.telefono, doc.calle, doc.numero,
+                doc.colonia, doc.ciudad, doc.estado, doc.codigo_postal
+            )
+
         conexion = ConexionBD.obtener_conexion()
         if not conexion:
             return False, "No se pudo conectar a MySQL."
@@ -39,7 +47,19 @@ class DoctorController:
             conexion.close()
 
     @staticmethod
-    def actualizar_doctor(id_doctor, nombre, apellido1, apellido2="", especialidad="", numero_cedula="", telefono="", calle="", numero="", colonia="", ciudad="", estado="", codigo_postal=""):
+    def registrar_doctor(doctor):
+        return DoctorController.crear_doctor(doctor)
+
+    @staticmethod
+    def actualizar_doctor(id_doctor, nombre="", apellido1="", apellido2="", especialidad="", numero_cedula="", telefono="", calle="", numero="", colonia="", ciudad="", estado="", codigo_postal=""):
+        if hasattr(id_doctor, "id_doctor"):
+            doc = id_doctor
+            return DoctorController.actualizar_doctor(
+                doc.id_doctor, doc.nombre, doc.apellido1, doc.apellido2, doc.especialidad,
+                doc.numero_cedula, doc.telefono, doc.calle, doc.numero,
+                doc.colonia, doc.ciudad, doc.estado, doc.codigo_postal
+            )
+
         conexion = ConexionBD.obtener_conexion()
         if not conexion:
             return False, "No se pudo conectar a MySQL."
