@@ -1,7 +1,11 @@
 import os
 import mysql.connector
-from tkinter import messagebox
+try:
+    from tkinter import messagebox
+except ImportError:
+    messagebox = None
 from dotenv import load_dotenv
+
 
 load_dotenv()
 
@@ -20,5 +24,8 @@ class ConexionBD:
             )
             return conexion
         except Exception as e:
-            messagebox.showerror("Error de conexión MySQL", f"No se pudo conectar a la base de datos:\n{e}")
-            return None
+         if messagebox:
+             messagebox.showerror("Error de conexión MySQL", f"No se pudo conectar a la base de datos:\n{e}")
+         else:
+             print(f"Error de conexión MySQL: {e}")
+         return None
