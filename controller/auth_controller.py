@@ -29,10 +29,11 @@ class AuthController:
             conexion.close()
 
     @staticmethod
-    def registrar_usuario(usuario, contrasena, rol):
+    def registrar_usuario(usuario, contrasena, rol, datos_extra=None):
         conexion = ConexionBD.obtener_conexion()
         if not conexion:
             return False, "No se pudo conectar a la base de datos."
+        datos_extra = datos_extra or {}
         try:
             cursor = conexion.cursor()
 
@@ -40,17 +41,37 @@ class AuthController:
             sql_admin = "INSERT INTO administrador (usuario, contrasena, privilegios) VALUES (%s, %s, %s)"
             cursor.execute(sql_admin, (usuario, contrasena, rol))
 
-            # 2. Si el rol es Doctor, darlo de alta automáticamente en la tabla doctor
-            if rol.strip().lower() == "doctor":
-                sql_doc = """INSERT INTO doctor (nombre, apellido1, especialidad, numero_cedula) 
-                             VALUES (%s, %s, %s, %s)"""
-                cursor.execute(sql_doc, (usuario, "Por definir", "General", f"CED-{usuario}"))
+            rol_limpio = rol.strip().lower()
 
-            # 3. Si el rol es Paciente, darlo de alta automáticamente en la tabla paciente
-            elif rol.strip().lower() == "paciente":
-                sql_pac = """INSERT INTO paciente (nombre, apellido1, telefono, tipo_sangre, estado_paciente) 
-                             VALUES (%s, %s, %s, %s, %s)"""
-                cursor.execute(sql_pac, (usuario, "Por definir", "0000000000", "O+", "Registrado"))
+            # 2. Si el rol es Doctor, insertar con sus datos completos
+            if rol_limpio == "doctor":
+                sql_doc = """INSERT INTO doctor 
+                             (nombre, apellido1, apellido2, especialidad, numero_cedula, telefono, ciudad) 
+                             VALUES (%s, %s, %s, %s, %s, %s, %s)"""
+                cursor.execute(sql_doc, (
+                    datos_extra.get("nombre") or usuario,
+                    datos_extra.get("apellido1", ""),
+                    datos_extra.get("apellido2", ""),
+                    datos_extra.get("especialidad", ""),
+                    datos_extra.get("numero_cedula", ""),
+                    datos_extra.get("telefono", ""),
+                    datos_extra.get("ciudad", "")
+                ))
+
+            # 3. Si el rol es Paciente, insertar con sus datos completos
+            elif rol_limpio == "paciente":
+                sql_pac = """INSERT INTO paciente 
+                             (nombre, apellido1, apellido2, telefono, tipo_sangre, alergias, estado_paciente) 
+                             VALUES (%s, %s, %s, %s, %s, %s, %s)"""
+                cursor.execute(sql_pac, (
+                    datos_extra.get("nombre") or usuario,
+                    datos_extra.get("apellido1", ""),
+                    datos_extra.get("apellido2", ""),
+                    datos_extra.get("telefono", ""),
+                    datos_extra.get("tipo_sangre", ""),
+                    datos_extra.get("alergias") or "Ninguna",
+                    datos_extra.get("estado_paciente") or "Registrado"
+                ))
 
             conexion.commit()
             return True, f"Usuario '{usuario}' registrado correctamente con rol {rol}."
@@ -59,7 +80,6 @@ class AuthController:
             return False, f"Error al registrar usuario: {e}"
         finally:
             conexion.close()
-
     @staticmethod
     def obtener_usuarios():
         conexion = ConexionBD.obtener_conexion()
