@@ -166,7 +166,10 @@ class MainView(tk.Frame):
         for widget in self.content.winfo_children():
             widget.destroy()
 
-        vista_cls(self.content)
+        if vista_cls in (PacienteView, TratamientoView):
+            vista_cls(self.content, self.admin)
+        else:
+            vista_cls(self.content)
 
     # ==========================================================
     # BARRA DE MENÚ SUPERIOR NATIVA

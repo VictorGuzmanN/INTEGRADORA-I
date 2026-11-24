@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from model.doctor import Doctor
 from controller.doctor_controller import DoctorController
+from utils_validacion import ValidationError, validar_solo_letras, validar_telefono, validar_alfanumerico
 
 
 class DoctorView:
@@ -68,25 +69,36 @@ class DoctorView:
         keys = ["Nombre:", "Apellido Paterno:", "Apellido Materno:", "Especialidad:", "Cédula Profesional:", "Teléfono:", "Ciudad:"]
         for idx, k in enumerate(keys, 1):
             self.entries[k].delete(0, tk.END)
-            self.entries[k].insert(0, vals[idx])
+            val = "" if str(vals[idx]) == "None" else vals[idx]
+            self.entries[k].insert(0, val)
 
-    def construir_objeto(self, id_doc=None):
+    def validar_y_construir(self, id_doc=None):
+        nombre = validar_solo_letras(self.entries["Nombre:"].get(), "Nombre", obligatorio=True)
+        apellido1 = validar_solo_letras(self.entries["Apellido Paterno:"].get(), "Apellido Paterno", obligatorio=True)
+        apellido2 = validar_solo_letras(self.entries["Apellido Materno:"].get(), "Apellido Materno", obligatorio=False)
+        especialidad = validar_solo_letras(self.entries["Especialidad:"].get(), "Especialidad", obligatorio=True)
+        cedula = validar_alfanumerico(self.entries["Cédula Profesional:"].get(), "Cédula Profesional", obligatorio=True)
+        telefono = validar_telefono(self.entries["Teléfono:"].get(), "Teléfono", obligatorio=True)
+        ciudad = validar_solo_letras(self.entries["Ciudad:"].get(), "Ciudad", obligatorio=True)
+
         return Doctor(
-            nombre=self.entries["Nombre:"].get().strip(),
-            apellido1=self.entries["Apellido Paterno:"].get().strip(),
-            apellido2=self.entries["Apellido Materno:"].get().strip(),
-            especialidad=self.entries["Especialidad:"].get().strip(),
-            numero_cedula=self.entries["Cédula Profesional:"].get().strip(),
-            telefono=self.entries["Teléfono:"].get().strip(),
-            ciudad=self.entries["Ciudad:"].get().strip(),
+            nombre=nombre,
+            apellido1=apellido1,
+            apellido2=apellido2,
+            especialidad=especialidad,
+            numero_cedula=cedula,
+            telefono=telefono,
+            ciudad=ciudad,
             id_doctor=id_doc
         )
 
     def guardar(self):
-        doc = self.construir_objeto()
-        if not doc.nombre or not doc.apellido1 or not doc.especialidad or not doc.numero_cedula:
-            messagebox.showwarning("Validación", "Complete los campos obligatorios.")
+        try:
+            doc = self.validar_y_construir()
+        except ValidationError as e:
+            messagebox.showwarning("Error de validación", str(e))
             return
+
         ok, msg = DoctorController.registrar_doctor(doc)
         if ok:
             messagebox.showinfo("Éxito", msg)
@@ -99,7 +111,12 @@ class DoctorView:
         if not self.id_seleccionado:
             messagebox.showwarning("Selección", "Seleccione un doctor de la tabla.")
             return
-        doc = self.construir_objeto(self.id_seleccionado)
+        try:
+            doc = self.validar_y_construir(self.id_seleccionado)
+        except ValidationError as e:
+            messagebox.showwarning("Error de validación", str(e))
+            return
+
         ok, msg = DoctorController.actualizar_doctor(doc)
         if ok:
             messagebox.showinfo("Éxito", msg)

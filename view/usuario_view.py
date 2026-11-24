@@ -1,6 +1,13 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from controller.auth_controller import AuthController
+from utils_validacion import (
+    ValidationError,
+    validar_solo_letras,
+    validar_telefono,
+    validar_alfanumerico,
+    validar_tipo_sangre
+)
 
 
 class UsuarioView:
@@ -123,19 +130,31 @@ class UsuarioView:
             messagebox.showwarning("Validación", "Ingrese nombre de usuario y contraseña.")
             return
 
-        datos_extra = {k: w.get().strip() for k, w in self.entries_extra.items()}
-
-        if rol == "Doctor":
-            obligatorios = ["nombre", "apellido1", "especialidad", "numero_cedula", "telefono", "ciudad"]
-            if any(not datos_extra.get(c) for c in obligatorios):
-                messagebox.showwarning("Campos de Doctor incompletos", "Complete Nombre, Apellido Paterno, Especialidad, Cédula, Teléfono y Ciudad.")
-                return
-
-        elif rol == "Paciente":
-            obligatorios = ["nombre", "apellido1", "telefono", "tipo_sangre"]
-            if any(not datos_extra.get(c) for c in obligatorios):
-                messagebox.showwarning("Campos de Paciente incompletos", "Complete Nombre, Apellido Paterno, Teléfono y Tipo de Sangre.")
-                return
+        datos_extra = {}
+        try:
+            if rol == "Doctor":
+                datos_extra = {
+                    "nombre": validar_solo_letras(self.entries_extra["nombre"].get(), "Nombre", obligatorio=True),
+                    "apellido1": validar_solo_letras(self.entries_extra["apellido1"].get(), "Apellido Paterno", obligatorio=True),
+                    "apellido2": validar_solo_letras(self.entries_extra["apellido2"].get(), "Apellido Materno", obligatorio=False),
+                    "especialidad": validar_solo_letras(self.entries_extra["especialidad"].get(), "Especialidad", obligatorio=True),
+                    "numero_cedula": validar_alfanumerico(self.entries_extra["numero_cedula"].get(), "Cédula Profesional", obligatorio=True),
+                    "telefono": validar_telefono(self.entries_extra["telefono"].get(), "Teléfono", obligatorio=True),
+                    "ciudad": validar_solo_letras(self.entries_extra["ciudad"].get(), "Ciudad", obligatorio=True),
+                }
+            elif rol == "Paciente":
+                datos_extra = {
+                    "nombre": validar_solo_letras(self.entries_extra["nombre"].get(), "Nombre", obligatorio=True),
+                    "apellido1": validar_solo_letras(self.entries_extra["apellido1"].get(), "Apellido Paterno", obligatorio=True),
+                    "apellido2": validar_solo_letras(self.entries_extra["apellido2"].get(), "Apellido Materno", obligatorio=False),
+                    "telefono": validar_telefono(self.entries_extra["telefono"].get(), "Teléfono", obligatorio=True),
+                    "tipo_sangre": validar_tipo_sangre(self.entries_extra["tipo_sangre"].get()),
+                    "alergias": validar_solo_letras(self.entries_extra["alergias"].get(), "Alergias", obligatorio=False) or "Ninguna",
+                    "estado_paciente": self.entries_extra["estado_paciente"].get(),
+                }
+        except ValidationError as e:
+            messagebox.showwarning("Error de validación", str(e))
+            return
 
         ok, msg = AuthController.registrar_usuario(usuario, contrasena, rol, datos_extra)
         if ok:
